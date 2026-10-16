@@ -5,6 +5,7 @@ const width = 960;
 const height = 360;
 const monthNames = d3.timeFormat("%B");
 
+// Load the daily records and convert them into one summarized cell per year-month.
 export const data = d3.csv("./temperature_daily.csv", d3.autoType).then((rows) => {
   const cells = Array.from(
     d3.rollup(
@@ -21,8 +22,11 @@ export const data = d3.csv("./temperature_daily.csv", d3.autoType).then((rows) =
     ([, months]) => Array.from(months.values()),
   ).flat();
 
+  // Reserve space for axis labels and define the grid dimensions.
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
+
+  // Use years as columns and the twelve calendar months as rows.
   const xScale = d3
     .scaleBand()
     .domain(cells.map((cell) => cell.year).sort(d3.ascending))
@@ -33,6 +37,8 @@ export const data = d3.csv("./temperature_daily.csv", d3.autoType).then((rows) =
     .domain(d3.range(12))
     .range([0, innerHeight])
     .padding(0.05);
+
+  // Use one shared color range so maximum and minimum views remain comparable.
   const temperatureExtent = [
     d3.min(cells, (cell) => cell.min),
     d3.max(cells, (cell) => cell.max),
@@ -42,6 +48,7 @@ export const data = d3.csv("./temperature_daily.csv", d3.autoType).then((rows) =
     .interpolator(d3.interpolateRdYlBu)
     .domain([temperatureExtent[1], temperatureExtent[0]]);
 
+  // Create the exported container, temperature toggle, and hover tooltip.
   const container = document.createElement("div");
   container.style.position = "relative";
   const controls = d3.select(container).append("div");
@@ -61,6 +68,8 @@ export const data = d3.csv("./temperature_daily.csv", d3.autoType).then((rows) =
     .style("border-radius", "3px")
     .style("background", "white")
     .style("font", "12px sans-serif");
+
+  // The main SVG contains the heatmap and its axes.
   const svg = d3
     .select(container)
     .append("svg")
@@ -73,6 +82,7 @@ export const data = d3.csv("./temperature_daily.csv", d3.autoType).then((rows) =
     .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
+  // Draw one rectangle for each year-month cell.
   const cellsSelection = chart
     .selectAll("rect")
     .data(cells)
@@ -83,6 +93,7 @@ export const data = d3.csv("./temperature_daily.csv", d3.autoType).then((rows) =
     .attr("height", yScale.bandwidth())
     .attr("fill", (cell) => colorScale(cell.max));
 
+  // Show the selected temperature measure while the pointer is over a cell.
   cellsSelection
     .on("mouseenter", (event, cell) => {
       const [x, y] = d3.pointer(event, container);
@@ -102,6 +113,7 @@ export const data = d3.csv("./temperature_daily.csv", d3.autoType).then((rows) =
     })
     .on("mouseleave", () => tooltip.style("display", "none"));
 
+  // Update cell colors, button text, and accessible labels when the measure changes.
   const updateTemperature = (measure) => {
     cellsSelection.attr("fill", (cell) => colorScale(cell[measure]));
     modeButton.text(measure === "max" ? "Maximum" : "Minimum");
@@ -117,6 +129,7 @@ export const data = d3.csv("./temperature_daily.csv", d3.autoType).then((rows) =
     updateTemperature(nextMeasure);
   });
 
+  // Add year and month labels to the heatmap.
   chart
     .append("g")
     .attr("transform", `translate(0,${innerHeight})`)
@@ -125,6 +138,7 @@ export const data = d3.csv("./temperature_daily.csv", d3.autoType).then((rows) =
     .append("g")
     .call(d3.axisLeft(yScale).tickFormat((month) => monthNames(new Date(2000, month, 1))));
 
+  // Build the color legend below the chart.
   const legendWidth = 280;
   const legendHeight = 48;
   const legend = d3
@@ -147,6 +161,8 @@ export const data = d3.csv("./temperature_daily.csv", d3.autoType).then((rows) =
     .attr("id", "temperature-gradient")
     .attr("x1", "0%")
     .attr("x2", "100%");
+
+  // Add several stops to approximate the continuous temperature color scale.
   d3.range(11).forEach((step) => {
     const value =
       temperatureExtent[0] +
