@@ -1,0 +1,26 @@
+{
+  "name": "csce-679",
+  "version": "1.0.0",
+  "description": "",
+  "main": "level1.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coreychrud/CSCE-679.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/coreychrud/CSCE-679/issues"
+  },
+  "homepage": "https://github.com/coreychrud/CSCE-679#readme",
+  "devDependencies": {
+    "vite": "^8.3.4"
+  },
+  "dependencies": {
+    "d3": "^7.9.0"
+  }
+}
