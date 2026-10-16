@@ -8,9 +8,14 @@
   <h1>Temperature Data</h1>
 
   <script type="module">
-    import { data } from "./level1.js";
+    import { data as level1 } from "./level1.js";
+    import { data as level2 } from "./level2.js";
 
-    data.then((chartElement) => {
+    level1.then((chartElement) => {
+      document.body.appendChild(chartElement);
+    });
+
+    level2.then((chartElement) => {
       document.body.appendChild(chartElement);
     });
   </script>

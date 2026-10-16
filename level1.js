@@ -5,8 +5,11 @@ const width = 960;
 const height = 360;
 const monthNames = d3.timeFormat("%B");
 
-// Load the daily records and convert them into one summarized cell per year-month.
-export const data = d3.csv("./temperature_daily.csv", d3.autoType).then((rows) => {
+// Load the daily records once so other visualizations can reuse the same data.
+export const temperatureRows = d3.csv("./temperature_daily.csv", d3.autoType);
+
+// Convert the daily records into one summarized cell per year-month.
+export const data = temperatureRows.then((rows) => {
   const cells = Array.from(
     d3.rollup(
       rows,
